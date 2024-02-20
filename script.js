@@ -5,6 +5,9 @@ const logo = document.getElementById('logo');
 const score = document.getElementById('score');
 const highScoreText = document.getElementById('highScore');
 
+const gameOverContainer = document.getElementById('game-over-container');
+const newRecordContainer = document.getElementById('new-record-container');
+
 // Definindo variáveis
 const gridSize = 20;
 let snake = [{ x: 10, y: 10 }];
@@ -45,9 +48,6 @@ function setPosition(element, position) {
     element.style.gridRow = position.y;
 }
 
-
-//draw();
-
 // Desenhando a comida do jogo
 function drawFood () {
     if (gameStarted) {
@@ -83,15 +83,13 @@ function move() {
     }
     snake.unshift (head);
 
-    //   snake.pop();
-
     if (head.x === food.x && head.y === food.y) {
         food = generateFood();
         increaseSpeed();
-        clearInterval(gameInterval); // Correção aqui
+        clearInterval(gameInterval);
         gameInterval = setInterval(() => {
            move();
-           checkColision();
+           checkCollision();
            draw();
         }, gameSpeedDelay);
     } else {
@@ -99,25 +97,22 @@ function move() {
     }
 }
 
-
 // Start Game
 function startGame() {
     gameStarted = true;
     instructionText.style.display = 'none';
     logo.style.display = 'none';
+    board.innerHTML = '';
     gameInterval = setInterval(() => {
         move();
-        checkColision();
+        checkCollision();
         draw();
-
     }, gameSpeedDelay);
 }
 
 // Keypress event listener
-
-// Keypress event listener
 function handleKeyPress(event) {
-    if (!gameStarted && (event.code === 'Space' || event.key === ' ')) { // Correção aqui
+    if (!gameStarted && (event.code === 'Space' || event.key === ' ')) {
         startGame();
     } else {
         switch (event.key) {
@@ -138,7 +133,6 @@ function handleKeyPress(event) {
 }
 
 function increaseSpeed() {
-    // console.log(gameSpeedDelay);
     if (gameSpeedDelay > 150) {
         gameSpeedDelay -= 5;
     } else if (gameSpeedDelay > 100) {
@@ -150,14 +144,21 @@ function increaseSpeed() {
     }
 }
 
-function checkColision() {
+function checkCollision() {
     const head = snake[0];
+    const currentScore = snake.length - 1;
     if (head.x < 1 || head.x > gridSize || head.y < 1 || head.y > gridSize) {
-        resetGame();
+        if (currentScore > highScore) {
+            newRecord();
+        }
+        gameOver();
+        return;
     }
-    for (let i = 1; i < snake.length; i++){
-        if (head.x === snake[i].x && head.y === snake[i].y)
-            resetGame();
+    for (let i = 1; i < snake.length; i++) {
+        if (head.x === snake[i].x && head.y === snake[i].y) {
+            gameOver();
+            return;
+        }
     }
 }
 
@@ -169,10 +170,18 @@ function resetGame() {
     direction = 'right';
     gameSpeedDelay = 200;
     updateScore();
+    const gameOverMessage = document.querySelector('.game-over-message');
+    if (gameOverMessage) {
+        gameOverMessage.remove();
+    }
+    const newRecordMessage = document.querySelector('.new-record-message');
+    if (newRecordMessage) {
+        newRecordMessage.remove();
+    }
 }
 
 function updateScore() {
-    const currentScore = snake.length -1;
+    const currentScore = snake.length - 1;
     score.textContent = currentScore.toString().padStart(3, '0');
 }
 
@@ -190,14 +199,39 @@ function updateHighScore() {
         highScoreText.textContent = highScore.toString().padStart(3, '0');
         highScoreText.style.display = 'block';
     }
-    // highScoreText.style.display = 'block';
 }
 
 document.addEventListener('keydown', handleKeyPress);
 
+//Adicionais
+function gameOver() {
+    clearInterval(gameInterval);
+    const gameOverMessage = document.createElement('div');
+    gameOverMessage.textContent = 'Game Over! Pontuação: ' + (snake.length - 1);
+    gameOverMessage.classList.add('game-over-message');
+    gameOverContainer.appendChild(gameOverMessage);
 
-// test move
-//setInterval(() => {
-//    move();
-//    draw();
-//}, 200);
+    if (snake.length - 1 > highScore) {
+        setTimeout(() => {
+            newRecord();
+        }, 2000);
+    } else {
+        setTimeout(() => {
+            resetGame(); 
+            gameOverMessage.remove();
+        }, 2000);
+    }
+}
+
+function newRecord() {
+    clearInterval(gameInterval);
+    const newRecordMessage = document.createElement('div');
+    newRecordMessage.textContent = 'New-record! Pontuação: ' + (snake.length - 1);
+    newRecordMessage.classList.add('new-record-message');
+    gameOverContainer.appendChild(newRecordMessage);
+
+    setTimeout(() => {
+        newRecordMessage.remove();
+        resetGame(); 
+    }, 2000);
+}
