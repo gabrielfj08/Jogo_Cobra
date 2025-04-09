@@ -31,4 +31,4 @@ Uma demonstração do jogo está disponível [aqui](https://gabrielfj08.github.i
 Contribuições são bem-vindas! Sinta-se à vontade para abrir um pull request com melhorias ou correções.
 
 ## Autor
-Este jogo foi desenvolvido pelo canal freeCodeCamp.org, [eu](https://github.com/gabrielfj08/Gabrielfj08) só o utilizei para ter uma primeira experiência e entrar na área do JavaScript.
+Este jogo foi desenvolvido pelo canal **freeCodeCamp.org**, [eu](https://github.com/gabrielfj08/Gabrielfj08) só o utilizei para ter uma primeira experiência e entrar na área do JavaScript.
